@@ -1,0 +1,129 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+
+	<div class="container">
+		<br>
+		<h1 class="center-text">Estación meteorológica</h1>
+		<br>
+		<div class="row">
+			<div class="col-xs-12 col-md-3">
+				<div class="card">
+					<h4 class="card-header">Período de muestreo (segundos)</h4>
+					<div class="card-body">
+						<select name="periodo" id="periodo" class="form-control">
+							<option value="1">1</option>
+							<option value="2">2</option>
+							<option value="5">5</option>
+							<option value="10">10</option>
+							<option value="30">30</option>
+							<option value="60">60</option>
+						</select>
+					</div>
+				</div>
+			</div>
+
+			<br>
+
+			<div class="col-xs-12 col-md-4">
+				<div class="card">
+					<h4 class="card-header">Ultimas muestras</h4>
+					<li class="list-group-item">
+						<label for="temperatura">Temperatura</label>
+						<input type="text" name="temperatura" id="temperatura" disabled="true" value="{{ultimatemperatura[0]}}" class="form-control"/>
+					</li>
+					<li class="list-group-item">
+						<label for="humedad">Humedad</label>
+						<input type="text" name="humedad" id="humedad" disabled="true" value="{{ultimahum[0]}}" class="form-control"/>
+					</li>
+					<li class="list-group-item">
+						<label for="presion">Presion</label>
+						<input type="text" name="presion" id="presion" disabled="true" value="{{ultimapresion[0]}}" class="form-control"/>
+					</li>
+					<li class="list-group-item">
+						<label for="vel-viento">Velocidad del viento</label>
+						<input type="text" name="vel-viento" id="vel-viento" disabled="true" value="{{ultimavelocidad[0]}}" class="form-control"/>
+					</li>
+				</div>
+			</div>
+
+			<br>
+
+			<div class="col-xs-12 col-md-4">
+				<div class="card">
+					<h4 class="card-header">Promedio 10 muestras</h4>
+					<ul class="list-group list-group-flush">
+				    <li class="list-group-item">
+							<label for="prom-temp"> Temperatura </label>
+							<input type="text" name="prom-temp" id="prom-temp" disabled="true" value="{{promediotemp[0]}}" class="form-control"/>
+						</li>
+				    <li class="list-group-item">
+							<label for="prom-hum"> Humedad </label>
+							<input type="text" name="prom-hum" id="prom-hum" disabled="true" value="{{promediohum[0]}}" class="form-control"/>
+				    </li>
+				    <li class="list-group-item">
+							<label for="prom-presion"> Presion </label>
+							<input type="text" name="prom-presion" id="prom-presion" disabled="true" value="{{promediopresion[0]}}" class="form-control"/>
+				    </li>
+						<li class="list-group-item">
+							<label for="prom-vel"> Velocidad del viento </label>
+							<input type="text" name="prom-vel" id="prom-vel" disabled="true" value="{{promediovel[0]}}" class="form-control"/>
+						</li>
+				  </ul>
+				</div>
+			</div>
+
+			<br>
+
+			<div class="col-md-1"></div>
+		</div>
+	</div>
+
+	<script>
+		$(document).ready(function() {
+
+			$.ajax({
+				url:'http://localhost:5000',
+				method: 'get'
+			});
+
+			$periodo = $('#periodo');
+			$promTemperatura = $('#prom-temp');
+			$promHumedad = $('#prom-hum');
+			$promPresion = $('#prom-presion');
+			$promVelocidad = $('#prom-vel');
+			$temperatura = $('#temperatura');
+			$humedad = $('#humedad');
+			$presion = $('#presion');
+			$velocidad = $('#vel-viento');
+
+			$periodo.change(function() {
+				$.ajax({
+					url:'configurar',
+					method: 'post',
+					data: {
+						periodo: $(this).val()
+					}
+				});
+			})
+
+			setInterval(function() {
+				$.ajax({url: '/datos', method: 'get'})
+					.done(function(response) {
+						$periodo.val(response.periodo[0]);
+						$promTemperatura.val(response.promedio_temperatura[0]);
+						$promHumedad.val(response.promedio_humedad[0]);
+						$promPresion.val(response.promedio_presion[0]);
+						$promVelocidad.val(response.promedio_velocidad[0]);
+						$temperatura.val(response.ultima_temperatura[0]);
+						$humedad.val(response.ultima_humedad[0]);
+						$presion.val(response.ultima_presion[0]);
+						$velocidad.val(response.ultima_velocidad[0]);
+					})
+			}, 1000);
+
+		})
+	</script>
+
+
+{% endblock %}
